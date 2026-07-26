@@ -1,0 +1,14 @@
+services:
+  spring-app:
+    build: .
+    container_name: spring-kafka-container
+    ports:
+      - "8080:8080"
+    networks:
+      - kafka-net
+
+networks:
+  # Diz ao Docker para não criar uma rede nova, mas usar a rede que a infra criou
+  back-net:
+    external: true
+    name: kafka-net
