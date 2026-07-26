@@ -1,0 +1,58 @@
+services:
+  kafka:
+    image: apache/kafka:4.1.1
+    container_name: kafka-kraft
+    ports:
+      - "9092:9092"
+    environment:
+      # Configurações do Broker e KRaft
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      # Ouvintes para comunicação interna (Docker) e externa (Spring/Sua Máquina)
+      # Abrimos as portas 9092 (externa) e 29092 (interna do Docker)
+      KAFKA_LISTENERS: 'EXTERNAL://0.0.0.0:9092,INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093'
+      
+      # Aqui está a mágica: anunciamos localhost para fora e o nome do container para dentro
+      KAFKA_ADVERTISED_LISTENERS: 'EXTERNAL://localhost:9092,INTERNAL://kafka:29092'
+      
+      # Mapeamento dos protocolos de segurança
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      # FIXAÇÃO DO ERRO: Diz ao Kafka qual rota interna usar entre brokers
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+      # Auto-criação de tópicos ativada para facilitar testes
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      LOG4J_LOGGER_ORG_APACHE_KAFKA: 'WARN'
+    networks:
+      - back-net
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  akhq:
+    image: tchiotludo/akhq:0.27.0
+    container_name: akhq-manager
+    ports:
+      - "8081:8080"
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka:
+              properties:
+                bootstrap.servers: "kafka:29092"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - back-net
+
+networks:
+  back-net:
+    driver: bridge
