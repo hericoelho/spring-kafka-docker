@@ -56,3 +56,4 @@ services:
 networks:
   back-net:
     driver: bridge
+    name: kafka_back-net

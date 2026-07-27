@@ -8,5 +8,7 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+COPY wait-for-kafka.sh /app/wait-for-kafka.sh
+RUN chmod +x /app/wait-for-kafka.sh
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/app/wait-for-kafka.sh"]
