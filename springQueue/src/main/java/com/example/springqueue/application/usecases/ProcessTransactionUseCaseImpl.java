@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
-@RequiredArgsConstructor  // ← Lombok gera o construtor com args
+@RequiredArgsConstructor
 public class ProcessTransactionUseCaseImpl implements ProcessTransactionUseCase {
 
     private final PublishTransactionPort publishTransactionPort;
