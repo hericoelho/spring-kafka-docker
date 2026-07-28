@@ -95,6 +95,33 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.19.1</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.example.springqueue.infrastructure.logging.SensitiveDataMask</param>
+                        <param>com.example.springqueue.infrastructure.adapter.out.memory.InMemoryIdempotencyStore</param>
+                        <param>com.example.springqueue.infrastructure.mapper.TransactionEventMapper</param>
+                        <param>com.example.springqueue.application.usecases.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.example.springqueue.infrastructure.logging.SensitiveDataMaskTest</param>
+                        <param>com.example.springqueue.infrastructure.adapter.out.memory.InMemoryIdempotencyStoreTest</param>
+                        <param>com.example.springqueue.infrastructure.mapper.TransactionEventMapperTest</param>
+                        <param>com.example.springqueue.application.usecases.*Test</param>
+                    </targetTests>
+                    <mutationThreshold>90</mutationThreshold>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>1.2.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 

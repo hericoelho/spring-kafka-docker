@@ -43,6 +43,12 @@ class SensitiveDataMaskTest {
         }
 
         @Test
+        @DisplayName("given string with length exactly 4, then should return fully masked")
+        void shouldFullyMaskStringOfLength4() {
+            assertEquals("****", SensitiveDataMask.mask("abcd"));
+        }
+
+        @Test
         @DisplayName("given string with length > 4, then should reveal only first 2 and last 2 chars")
         void shouldPartiallyMaskMediumString() {
             assertEquals("ab**ef", SensitiveDataMask.mask("abcdef"));
