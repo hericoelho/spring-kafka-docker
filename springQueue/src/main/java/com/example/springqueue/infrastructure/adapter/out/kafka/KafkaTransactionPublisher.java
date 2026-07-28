@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -22,8 +26,18 @@ public class KafkaTransactionPublisher implements PublishTransactionPort {
     @Override
     @CircuitBreaker(name = "kafkaPublisher", fallbackMethod = "publishFallback")
     public void publish(TransactionEvent transactionEvent) {
-        kafkaTemplate.send(transactionTopic, transactionEvent.id(), transactionEvent);
-        log.info("Sent to Kafka: topic={}, key={}", transactionTopic, transactionEvent.id());
+        try {
+            kafkaTemplate.send(transactionTopic, transactionEvent.id(), transactionEvent)
+                    .get(5, TimeUnit.SECONDS);
+            log.info("Sent to Kafka: topic={}, key={}", transactionTopic, transactionEvent.id());
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Kafka send timed out after 5s", e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Kafka send failed: " + e.getCause().getMessage(), e.getCause());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Kafka send interrupted", e);
+        }
     }
 
     public void publishFallback(TransactionEvent transactionEvent, Exception ex) {
