@@ -47,13 +47,14 @@ public class KafkaTransactionListener {
             if (processed) {
                 log.info("Transaction processed successfully: id={}", transactionEvent.id());
             }
-            acknowledgment.acknowledge();
         }  catch (BusinessException e) {
             log.error("Business error processing transaction: id={}, msg={}", transactionEvent.id(), e.getMessage());
             throw e;
         }  catch (Exception e) {
             log.error("Generic error processing transaction: id={}", transactionEvent.id(), e);
             throw e;
+        } finally {
+            acknowledgment.acknowledge();
         }
     }
 
