@@ -76,6 +76,18 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <scope>compile</scope>
         </dependency>
+        <!-- Resilience4j Circuit Breaker -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
+        <!-- Distributed Tracing (Micrometer + Zipkin) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-zipkin</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

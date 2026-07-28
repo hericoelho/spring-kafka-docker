@@ -53,6 +53,14 @@ services:
     networks:
       - back-net
 
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    networks:
+      - back-net
+
 networks:
   back-net:
     driver: bridge
