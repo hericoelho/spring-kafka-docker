@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -67,6 +68,7 @@ class TransactionControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
                     .andExpect(status().isAccepted())
+                    .andExpect(header().string("X-Correlation-Id", org.hamcrest.Matchers.notNullValue()))
                     .andExpect(jsonPath("$.protocolId").value("protocol-abc-123"));
         }
     }
